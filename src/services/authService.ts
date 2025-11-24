@@ -1,6 +1,6 @@
 import { zaloAdapter } from '@/adapters';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://studynote-server-2pwg8b20m-justtoms-projects.vercel.app/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://studynote-server-bkrn337w2-justtoms-projects.vercel.app/api';
 
 
 
