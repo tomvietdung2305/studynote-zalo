@@ -1,6 +1,8 @@
 import { SnackbarProvider, Box, ZMPRouter } from "zmp-ui";
 import { zaloAdapter } from "@/adapters";
 import { PlatformApp } from "@/components/PlatformApp";
+import { isWeb } from "@/utils/platform";
+import { WebLoginPage } from "@/pages/WebLoginPage";
 import { AppProvider, useAppNavigation, type PageName } from "@/context/AppContext";
 import { Navigation } from "@/components/navigation";
 import { AuthWrapper } from "@/components/AuthWrapper";
@@ -36,8 +38,6 @@ function AppContent() {
         return <ParentConnectPage />;
       case 'parent-dashboard':
         return <ParentDashboardPage />;
-      case 'student-detail':
-        return <div>Student Detail</div>; // Hidden for MVP
       default:
         return <DashboardPage />;
     }
@@ -52,9 +52,16 @@ function AppContent() {
 }
 
 const LayoutWrapper = () => {
+  // On web, show simple login page instead of full app
+  if (isWeb()) {
+    console.log('[Layout] Web environment detected, showing WebLoginPage');
+    return <WebLoginPage />;
+  }
+
+  // In Zalo, show full app with ZMP UI components
   const theme = zaloAdapter.getTheme();
 
-  console.log('[Layout] Rendering with theme:', theme);
+  console.log('[Layout] Zalo environment, rendering with theme:', theme);
 
   return (
     <PlatformApp theme={theme}>
