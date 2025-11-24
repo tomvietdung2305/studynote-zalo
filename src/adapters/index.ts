@@ -5,9 +5,9 @@
 
 import { getPlatform } from '@/utils/platform';
 import { WebAdapter } from './WebAdapter';
+import { ZaloSDKAdapter } from './ZaloSDKAdapter';
 import type { IZaloAdapter } from './IZaloAdapter';
 
-// Lazy load ZaloSDKAdapter to avoid importing zmp-sdk on web
 let _adapter: IZaloAdapter | null = null;
 
 const createAdapter = (): IZaloAdapter => {
@@ -17,9 +17,6 @@ const createAdapter = (): IZaloAdapter => {
 
     if (platform === 'zalo') {
         console.log('Using ZaloSDKAdapter');
-        // Dynamically import ZaloSDKAdapter only in Zalo environment
-        // This prevents zmp-sdk from being loaded on web
-        const { ZaloSDKAdapter } = require('./ZaloSDKAdapter');
         _adapter = new ZaloSDKAdapter();
     } else {
         console.log('Using WebAdapter');
