@@ -1,7 +1,7 @@
 import { zaloAdapter } from '@/adapters';
 
 // Use localtunnel HTTPS URL to avoid Mixed Content error on mobile
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://stupid-steaks-stick.loca.lt/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nasty-nights-brake.loca.lt/api';
 
 
 
@@ -21,6 +21,7 @@ export const authService = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Bypass-Tunnel-Reminder': 'true',
                 },
                 body: JSON.stringify({
                     accessToken: 'dev_token',
@@ -64,6 +65,7 @@ export const authService = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Bypass-Tunnel-Reminder': 'true',
                 },
                 body: JSON.stringify({
                     accessToken,

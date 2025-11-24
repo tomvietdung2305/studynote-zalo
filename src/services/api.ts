@@ -1,6 +1,6 @@
 import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nasty-nights-brake.loca.lt/api';
 
 export interface ApiError {
   message: string;
@@ -20,6 +20,7 @@ export const api = {
         ...options,
         headers: {
           'Content-Type': 'application/json',
+          'Bypass-Tunnel-Reminder': 'true',
           ...(token && { 'Authorization': `Bearer ${token}` }),
           ...options?.headers,
         },
