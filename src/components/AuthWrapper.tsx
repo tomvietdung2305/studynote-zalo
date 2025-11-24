@@ -16,6 +16,8 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     const [, setCurrentUser] = useAtom(currentUserAtom);
     const [loading, setLoading] = useState(true);
 
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         // Check if user is authenticated on mount
         const checkAuth = async () => {
@@ -30,14 +32,33 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
                     setIsAuthenticated(true);
                     setCurrentUser(user);
                 } else {
-                    console.log('No token found');
-                    setIsAuthenticated(false);
+                    console.log('No token found, attempting auto-login (Bypass Mode)...');
+                    // Auto-login for development bypass
+                    try {
+                        const data = await authService.devLogin();
+                        console.log('Auto-login successful:', data);
+                        setIsAuthenticated(true);
+                        setCurrentUser(data.user);
+                    } catch (loginError: any) {
+                        console.error('Auto-login failed:', loginError);
+                        setError(`Login failed: ${loginError.message}`);
+                        setIsAuthenticated(false);
+                    }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Auth check failed:', error);
                 // Clear invalid token
                 authService.logout();
-                setIsAuthenticated(false);
+                // Try auto-login even if check failed
+                try {
+                    console.log('Attempting auto-login after auth check failure...');
+                    const data = await authService.devLogin();
+                    setIsAuthenticated(true);
+                    setCurrentUser(data.user);
+                } catch (retryError: any) {
+                    setError(`Auth failed: ${retryError.message}`);
+                    setIsAuthenticated(false);
+                }
             } finally {
                 setLoading(false);
             }
@@ -53,6 +74,23 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Đang tải...</p>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-screen bg-red-50 p-4">
+                <div className="text-red-600 mb-4 text-center">
+                    <h3 className="text-lg font-bold">Lỗi Đăng Nhập</h3>
+                    <p>{error}</p>
+                </div>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+                >
+                    Thử Lại
+                </button>
             </div>
         );
     }

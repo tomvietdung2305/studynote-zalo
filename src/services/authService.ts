@@ -1,7 +1,7 @@
 import { zaloAdapter } from '@/adapters';
 
 // Use localtunnel HTTPS URL to avoid Mixed Content error on mobile
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nasty-nights-brake.loca.lt/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://thick-suits-teach.loca.lt/api';
 
 
 
@@ -44,7 +44,23 @@ export const authService = {
             return data;
         } catch (error) {
             console.error('Dev login error:', error);
-            throw error;
+            // Fallback to offline mode if backend is unreachable
+            console.log('Falling back to offline dev mode...');
+            const mockUserInfo = {
+                id: 'dev_teacher_001',
+                name: 'Giáo viên Test (Offline)',
+                avatar: '',
+            };
+
+            const offlineData = {
+                token: 'offline_dev_token',
+                user: mockUserInfo
+            };
+
+            localStorage.setItem('auth_token', offlineData.token);
+            localStorage.setItem('user_info', JSON.stringify(offlineData.user));
+
+            return offlineData;
         }
     },
 
