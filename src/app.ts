@@ -1,3 +1,5 @@
+
+
 // ZaUI stylesheet
 import "zmp-ui/zaui.css";
 // Tailwind stylesheet
@@ -10,7 +12,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 
 // Mount the app
-import Layout from "@/components/layout";
+const Layout = React.lazy(() => import("@/components/layout"));
 
 // Expose app configuration
 import appConfig from "../app-config.json";
@@ -48,5 +50,9 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 const root = createRoot(document.getElementById("app")!);
 root.render(
-  React.createElement(ErrorBoundary, null, React.createElement(Layout))
+  React.createElement(ErrorBoundary, null,
+    React.createElement(React.Suspense, { fallback: React.createElement('div', null, 'Loading App...') },
+      React.createElement(Layout)
+    )
+  )
 );

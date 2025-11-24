@@ -1,6 +1,6 @@
-import { getAccessToken } from 'zmp-sdk';
+import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 export interface ApiError {
   message: string;
@@ -14,8 +14,8 @@ export const api = {
     options?: RequestInit
   ): Promise<T> {
     try {
-      const token = await getAccessToken();
-      
+      const token = authService.getToken();
+
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers: {
@@ -30,7 +30,7 @@ export const api = {
           message: `API Error: ${response.statusText}`,
           statusCode: response.status,
         };
-        
+
         try {
           const data = await response.json();
           error.message = data.message || error.message;
@@ -38,7 +38,7 @@ export const api = {
         } catch (e) {
           // Ignore parse error
         }
-        
+
         throw error;
       }
 
