@@ -1,6 +1,6 @@
-import { App, SnackbarProvider, Box, ZMPRouter } from "zmp-ui";
+import { SnackbarProvider, Box, ZMPRouter } from "zmp-ui";
 import { zaloAdapter } from "@/adapters";
-import { AppProps } from "zmp-ui/app";
+import { PlatformApp } from "@/components/PlatformApp";
 import { AppProvider, useAppNavigation, type PageName } from "@/context/AppContext";
 import { Navigation } from "@/components/navigation";
 import { AuthWrapper } from "@/components/AuthWrapper";
@@ -44,20 +44,20 @@ function AppContent() {
   };
 
   return (
-    <Box className="w-full min-h-screen bg-gray-50 flex flex-col">
-      <div className="flex-1 overflow-y-auto pb-20">
-        {renderPage()}
-      </div>
+    <>
+      {renderPage()}
       <Navigation />
-    </Box>
+    </>
   );
 }
 
 const LayoutWrapper = () => {
-  const theme: AppProps["theme"] = zaloAdapter.getTheme();
+  const theme = zaloAdapter.getTheme();
+
+  console.log('[Layout] Rendering with theme:', theme);
 
   return (
-    <App theme={theme}>
+    <PlatformApp theme={theme}>
       {/* @ts-ignore */}
       <SnackbarProvider>
         <AppProvider>
@@ -68,7 +68,7 @@ const LayoutWrapper = () => {
           </ZMPRouter>
         </AppProvider>
       </SnackbarProvider>
-    </App>
+    </PlatformApp>
   );
 };
 

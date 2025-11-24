@@ -48,11 +48,28 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
-const root = createRoot(document.getElementById("app")!);
-root.render(
-  React.createElement(ErrorBoundary, null,
-    React.createElement(React.Suspense, { fallback: React.createElement('div', null, 'Loading App...') },
-      React.createElement(Layout)
+console.log('[App] Starting app initialization...');
+console.log('[App] APP_CONFIG:', window.APP_CONFIG);
+
+const appElement = document.getElementById("app");
+console.log('[App] App element:', appElement);
+
+if (!appElement) {
+  console.error('[App] CRITICAL: #app element not found!');
+  document.body.innerHTML = '<div style="padding: 20px; color: red;"><h1>Error: App container not found</h1><p>The #app div is missing from index.html</p></div>';
+} else {
+  console.log('[App] Creating React root...');
+  const root = createRoot(appElement);
+
+  console.log('[App] Rendering app...');
+  root.render(
+    React.createElement(ErrorBoundary, null,
+      React.createElement(React.Suspense, { fallback: React.createElement('div', { style: { padding: 20, background: 'white' } }, 'Loading App...') },
+        React.createElement(Layout)
+      )
     )
-  )
-);
+  );
+
+  console.log('[App] App rendered successfully');
+}
+
