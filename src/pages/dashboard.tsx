@@ -1,227 +1,221 @@
 import { useState, useEffect } from 'react';
-import { Page, Header, Text, Box, Button, List, Icon, useSnackbar } from 'zmp-ui';
+import { Page, Text, Box, Button } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
-import { useClasses, useClassStudents } from '@/hooks/useApi';
-import { zaloAdapter } from '@/adapters';
-
-const dayNames = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+import { useClasses } from '@/hooks/useApi';
+import { Greeting } from '@/components/shared/Greeting';
+import { FollowOABanner } from '@/components/shared/FollowOABanner';
+import { StatsCard } from '@/components/shared/StatsCard';
+import { ActionGrid, ActionItem } from '@/components/shared/ActionGrid';
+import { StreakBadge } from '@/components/shared/StreakBadge';
+import { apiService } from '@/services/apiService';
 
 function DashboardPage() {
   const { navigateTo } = useAppNavigation();
   const { classes, loading } = useClasses();
-  const [selectedClass, setSelectedClass] = useState<string>('');
-  const { openSnackbar } = useSnackbar();
+  const [user, setUser] = useState<any>(null);
+  const [streak, setStreak] = useState(0);
+  const [showFollowOA, setShowFollowOA] = useState(true);
 
-  const requestNotificationPerm = async () => {
-    try {
-      await zaloAdapter.requestSendNotification({});
-      openSnackbar({
-        text: "Đã cấp quyền nhận thông báo!",
-        type: "success"
-      });
-    } catch (error) {
-      console.error(error);
-      openSnackbar({
-        text: "Lỗi cấp quyền hoặc người dùng từ chối",
-        type: "error"
-      });
-    }
-  };
-
-  // Fetch students for selected class
-  const { students } = useClassStudents(selectedClass);
-
-  // Set first class as selected when classes are loaded
+  // Get user info from localStorage
   useEffect(() => {
-    if (classes.length > 0 && !selectedClass) {
-      setSelectedClass(classes[0].id);
-    }
-  }, [classes, selectedClass]);
+    const loadUser = () => {
+      // Get user from localStorage (set by AuthWrapper)
+      const storedUser = localStorage.getItem('current_user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        // Fallback to mock data
+        setUser({ name: 'Giáo viên', role: 'teacher' });
+      }
 
-  const selectedClassData = classes.find(c => c.id === selectedClass) || classes[0];
+      // Mock streak for demo (would come from backend)
+      setStreak(Math.floor(Math.random() * 15) + 1);
+    };
+    loadUser();
+  }, []);
+
+  // Calculate total students
+  const totalStudents = classes.reduce((sum, cls) => sum + (cls.total_students || 0), 0);
+  const totalClasses = classes.length;
+
+  // Action buttons
+  const actions: ActionItem[] = [
+    {
+      id: 'attendance',
+      icon: 'zi-check-circle',
+      label: 'Điểm danh',
+      onClick: () => navigateTo('quick-attendance'),
+      color: 'green',
+    },
+    {
+      id: 'classes',
+      icon: 'zi-list-1',
+      label: 'Quản lý lớp',
+      onClick: () => navigateTo('class-management'),
+      color: 'blue',
+    },
+    {
+      id: 'grades',
+      icon: 'zi-star',
+      label: 'Nhập điểm',
+      onClick: () => navigateTo('grades-input'),
+      color: 'orange',
+    },
+    {
+      id: 'message',
+      icon: 'zi-chat',
+      label: 'Gửi thông báo',
+      onClick: () => navigateTo('broadcast-message'),
+      color: 'purple',
+    },
+  ];
 
   if (loading) {
     return (
-      <Page className="bg-gray-100">
-        <Header title="Sổ Liên Lạc Thông Minh" showBackIcon={false} />
-        <Box p={4} className="bg-white">
-          <Text>Đang tải dữ liệu...</Text>
+      <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+        <Box className="flex items-center justify-center h-screen">
+          <Text className="text-gray-500">Đang tải...</Text>
         </Box>
       </Page>
     );
   }
 
-  if (!selectedClassData) {
+  if (!user) {
     return (
-      <Page className="bg-gray-100">
-        <Header title="Sổ Liên Lạc Thông Minh" showBackIcon={false} />
-        <Box p={4} className="bg-white">
-          <Text>Chưa có lớp học nào. Hãy tạo lớp mới!</Text>
-          <Button onClick={() => navigateTo('class-management')} className="mt-4">
-            Tạo lớp học
-          </Button>
+      <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+        <Box className="flex items-center justify-center h-screen">
+          <Text className="text-gray-500">Đang tải thông tin...</Text>
+        </Box>
+      </Page>
+    );
+  }
+
+  // First time setup - no classes
+  if (totalClasses === 0) {
+    return (
+      <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+        <Box className="p-6">
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📚</div>
+            <Text.Title className="mb-2">Chào mừng đến với Sổ Liên Lạc!</Text.Title>
+            <Text className="text-gray-600 mb-6">
+              Hãy bắt đầu bằng cách tạo lớp học đầu tiên của bạn
+            </Text>
+            <Button
+              size="large"
+              onClick={() => navigateTo('class-management')}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+            >
+              Tạo lớp học đầu tiên
+            </Button>
+          </div>
         </Box>
       </Page>
     );
   }
 
   return (
-    <Page className="bg-gray-100">
-      <Header title="Sổ Liên Lạc Thông Minh" showBackIcon={false} />
-
-      <Box p={4} className="bg-white mb-4 pt-20">
-        <Text.Title size="small" className="mb-4">Quản lý nhanh</Text.Title>
-        <Box className="grid grid-cols-2 gap-4">
-          <div onClick={() => navigateTo('class-management')} className="bg-blue-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm">
-              <Icon icon="zi-list-1" />
-            </div>
-            <span className="font-medium text-sm text-blue-800">Lớp Học</span>
-          </div>
-          <div onClick={() => navigateTo('quick-attendance')} className="bg-green-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-green-600 shadow-sm">
-              <Icon icon="zi-check-circle" />
-            </div>
-            <span className="font-medium text-sm text-green-800">Điểm Danh</span>
-          </div>
-          <div onClick={() => navigateTo('grades-input')} className="bg-orange-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-orange-600 shadow-sm">
-              <Icon icon="zi-star" />
-            </div>
-            <span className="font-medium text-sm text-orange-800">Nhập Điểm</span>
-          </div>
-          <div onClick={() => navigateTo('broadcast-message')} className="bg-purple-100 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-sm">
-              <Icon icon="zi-chat" />
-            </div>
-            <span className="font-medium text-sm text-purple-800">Gửi Tin</span>
-          </div>
-          {/* Debug Button for Notification Permission */}
-          <div onClick={requestNotificationPerm} className="col-span-2 bg-gray-100 p-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform mt-2">
-            <Icon icon="zi-info-circle" className="text-gray-600" />
-            <span className="text-xs font-medium text-gray-600">Bật thông báo (Test)</span>
-          </div>
-        </Box>
+    <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+      {/* Gradient Header */}
+      <Box className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 rounded-b-3xl shadow-lg mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <Greeting userName={user.name || 'Giáo viên'} userRole="teacher" />
+        </div>
+        <div className="flex justify-center">
+          <StreakBadge days={streak} size="medium" variant="compact" />
+        </div>
       </Box>
 
-      <Box p={4} className="mb-4">
-        <Text.Title size="small" className="mb-2">Chọn lớp học</Text.Title>
-        <Box flex flexDirection="row" style={{ gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-          {classes.map((cls) => (
-            <div
+      {/* Follow OA Banner */}
+      {showFollowOA && (
+        <Box className="px-4">
+          <FollowOABanner
+            variant="inline"
+            message="Quan tâm OA để nhận thông báo tự động khi có cập nhật mới"
+            onFollow={() => {
+              console.log('Followed OA');
+              setShowFollowOA(false);
+            }}
+            onDismiss={() => setShowFollowOA(false)}
+          />
+        </Box>
+      )}
+
+      {/* Quick Actions */}
+      <Box className="px-4 mb-4">
+        <Text.Title size="small" className="mb-3 text-gray-900">
+          Quản lý nhanh
+        </Text.Title>
+        <ActionGrid actions={actions} columns={4} size="medium" />
+      </Box>
+
+      {/* Stats Section */}
+      <Box className="px-4 mb-4">
+        <Text.Title size="small" className="mb-3 text-gray-900">
+          Thống kê hôm nay
+        </Text.Title>
+        <div className="grid grid-cols-3 gap-3">
+          <StatsCard
+            icon="zi-list-1"
+            value={totalClasses}
+            label="Lớp học"
+            color="blue"
+          />
+          <StatsCard
+            icon="zi-user"
+            value={totalStudents}
+            label="Học sinh"
+            color="green"
+          />
+          <StatsCard
+            icon="zi-check-circle"
+            value={0}
+            label="Đã điểm danh"
+            color="purple"
+          />
+        </div>
+      </Box>
+
+      {/* Recent Activity */}
+      <Box className="px-4 mb-20">
+        <div className="flex items-center justify-between mb-3">
+          <Text.Title size="small" className="text-gray-900">
+            Lớp học của bạn
+          </Text.Title>
+          <Text
+            size="small"
+            className="text-blue-500"
+            onClick={() => navigateTo('class-management')}
+          >
+            Xem tất cả →
+          </Text>
+        </div>
+        <div className="space-y-3">
+          {classes.slice(0, 3).map((cls) => (
+            <Box
               key={cls.id}
-              onClick={() => setSelectedClass(cls.id)}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '20px',
-                background: selectedClass === cls.id ? '#006AF5' : 'white',
-                color: selectedClass === cls.id ? 'white' : '#333',
-                border: selectedClass === cls.id ? 'none' : '1px solid #ddd',
-                whiteSpace: 'nowrap',
-                fontSize: '14px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
+              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-98 transition-transform"
+              onClick={() => navigateTo('quick-attendance')}
             >
-              {cls.name} ({cls.total_students || 0})
-            </div>
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <Text className="font-semibold text-gray-900 mb-1">
+                    {cls.name}
+                  </Text>
+                  <Text size="xSmall" className="text-gray-500">
+                    {cls.total_students || 0} học sinh
+                    {cls.schedules && cls.schedules.length > 0 &&
+                      ` • ${cls.schedules.length} buổi/tuần`
+                    }
+                  </Text>
+                </div>
+                <div className="bg-blue-50 rounded-full p-2">
+                  <Text className="text-blue-600">→</Text>
+                </div>
+              </div>
+            </Box>
           ))}
-        </Box>
-      </Box>
-
-      {selectedClassData && (
-        <Box p={4} className="bg-white mb-4 mx-4 rounded-lg shadow-sm">
-          <Text.Title size="small" className="mb-2">📅 Lịch Dạy Hôm Nay</Text.Title>
-          {(() => {
-            const today = new Date().getDay();
-            const todaySchedules = selectedClassData.schedules.filter(s => s.dayOfWeek === today);
-
-            if (todaySchedules.length === 0) {
-              return <Text size="small" className="text-gray-500">Không có lịch dạy hôm nay ({dayNames[today]})</Text>;
-            }
-
-            return (
-              <Box>
-                {todaySchedules.map((schedule, idx) => (
-                  <Box key={idx} className="bg-blue-50 p-3 rounded-md mb-2 border-l-4 border-blue-500">
-                    <Text className="text-blue-600 font-bold">
-                      🕐 {schedule.startTime} - {schedule.endTime}
-                    </Text>
-                  </Box>
-                ))}
-              </Box>
-            );
-          })()}
-        </Box>
-      )}
-
-      <Box p={4} className="mb-4">
-        <Box flex flexDirection="row" style={{ gap: 12 }}>
-          <Box className="bg-white p-4 rounded-lg flex-1 text-center shadow-sm">
-            <Text.Title size="large" className="text-blue-600">{selectedClassData?.total_students || 0}</Text.Title>
-            <Text size="xxSmall" className="text-gray-500">Sĩ số lớp</Text>
-          </Box>
-          <Box className="bg-red-50 p-4 rounded-lg flex-1 text-center shadow-sm border border-red-100">
-            <Text.Title size="large" className="text-red-600">0</Text.Title>
-            <Text size="xxSmall" className="text-gray-500">Vắng hôm nay</Text>
-          </Box>
-        </Box>
-      </Box>
-
-      <Box p={4} className="mb-4">
-        <Button
-          fullWidth
-          size="large"
-          className="mb-3 bg-green-600 shadow-lg shadow-green-200"
-          onClick={() => navigateTo('quick-attendance')}
-          prefixIcon={<Icon icon="zi-check-circle" />}
-        >
-          ⚡ Điểm Danh Nhanh (30s)
-        </Button>
-      </Box>
-
-      {/* Student List */}
-      {students.length > 0 && (
-        <Box className="bg-white mt-2 mb-4">
-          <Box p={4} pb={0}>
-            <Text.Title size="small">📋 Danh sách học sinh ({students.length})</Text.Title>
-          </Box>
-          <List>
-            {students.map((student) => (
-              <List.Item
-                key={student.id}
-                title={
-                  <div className="flex items-center justify-between">
-                    <span>{student.name}</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${student.parent_zalo_id
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      {student.parent_zalo_id ? '✅ Đã kết nối' : '⏳ Chưa kết nối'}
-                    </span>
-                  </div>
-                }
-                subTitle={`ID: ${student.id.substring(0, 8)}`}
-              />
-            ))}
-          </List>
-        </Box>
-      )}
-
-      <Box p={4} className="pb-8">
-        <Button
-          fullWidth
-          variant="tertiary"
-          className="text-red-500 bg-red-50"
-          onClick={async () => {
-            const { authService } = await import('@/services/authService');
-            authService.logout();
-            window.location.reload(); // Reload to trigger auth check and redirect to login
-          }}
-        >
-          Đăng xuất
-        </Button>
+        </div>
       </Box>
     </Page>
   );

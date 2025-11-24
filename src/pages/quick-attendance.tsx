@@ -64,17 +64,18 @@ function QuickAttendancePage() {
   const currentAbsentCount = students.filter(s => attendance[s.id] === 'absent').length;
 
   return (
-    <Page className="bg-gray-100">
+    <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
       <Header title="Điểm Danh Nhanh" showBackIcon={true} onBackClick={goBack} />
 
-      <Box p={4} className="bg-white mb-4 pt-20">
+      {/* Date Selection Card */}
+      <Box className="bg-white p-4 mb-4 shadow-sm">
         <Box flex flexDirection="row" justifyContent="space-between" alignItems="center" className="mb-4">
           <Box>
-            <Text size="xSmall" className="text-gray-500">Ngày điểm danh</Text>
+            <Text size="xSmall" className="text-gray-500 mb-1">Ngày điểm danh</Text>
             <Box flex flexDirection="row" alignItems="center" style={{ gap: 8 }}>
-              <Text size="large" className="font-bold">{getDayName(selectedDate)}</Text>
+              <Text.Title size="small">{getDayName(selectedDate)}</Text.Title>
               {isScheduledDay(selectedDate) && (
-                <Box className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
+                <Box className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-medium">
                   Theo lịch
                 </Box>
               )}
@@ -84,26 +85,25 @@ function QuickAttendancePage() {
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            style={{
-              width: 140,
-              padding: '8px',
-              borderRadius: '8px',
-              border: '1px solid #e5e7eb',
-              outline: 'none'
-            }}
+            className="px-3 py-2 rounded-lg border border-gray-200 text-sm"
           />
         </Box>
 
-        <Box flex flexDirection="row" style={{ gap: 12 }}>
-          <Box className="bg-green-50 p-3 rounded-lg flex-1 text-center border border-green-100">
-            <Text.Title size="large" className="text-green-600">{currentPresentCount}</Text.Title>
-            <Text size="xxSmall" className="text-gray-500">Có mặt</Text>
+        {/* Stats Row */}
+        <div className="grid grid-cols-3 gap-3">
+          <Box className="bg-gray-50 rounded-lg p-3 text-center">
+            <Text.Title className="text-gray-900 mb-1">{students.length}</Text.Title>
+            <Text size="xSmall" className="text-gray-500">Tổng số</Text>
           </Box>
-          <Box className="bg-red-50 p-3 rounded-lg flex-1 text-center border border-red-100">
-            <Text.Title size="large" className="text-red-600">{currentAbsentCount}</Text.Title>
-            <Text size="xxSmall" className="text-gray-500">Vắng</Text>
+          <Box className="bg-green-50 rounded-lg p-3 text-center border border-green-100">
+            <Text.Title className="text-green-600 mb-1">{currentPresentCount}</Text.Title>
+            <Text size="xSmall" className="text-gray-500">Có mặt</Text>
           </Box>
-        </Box>
+          <Box className="bg-red-50 rounded-lg p-3 text-center border border-red-100">
+            <Text.Title className="text-red-600 mb-1">{currentAbsentCount}</Text.Title>
+            <Text size="xSmall" className="text-gray-500">Vắng</Text>
+          </Box>
+        </div>
       </Box>
 
       <Box className="mb-20">

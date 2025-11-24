@@ -6,6 +6,16 @@
 export type Platform = 'zalo' | 'web';
 
 /**
+ * Check if developer wants to view mobile UI on desktop
+ * Use ?mode=mobile in URL to force mobile view
+ */
+export const isDevelopmentMobileMode = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('mode') === 'mobile';
+};
+
+/**
  * Check if running in Zalo Mini App environment
  */
 export const isZaloEnvironment = (): boolean => {
@@ -30,9 +40,13 @@ export const getPlatform = (): Platform => {
 };
 
 /**
- * Check if running on web
+ * Check if running on web (and NOT in development mobile mode)
  */
 export const isWeb = (): boolean => {
+    // If in development mobile mode, pretend we're not on web
+    if (isDevelopmentMobileMode()) {
+        return false;
+    }
     return getPlatform() === 'web';
 };
 

@@ -157,7 +157,7 @@ function GradesInputPage() {
   };
 
   return (
-    <Page className="bg-gray-100">
+    <Page className="bg-gray-100" style={{ marginTop: '44px' }}>
       <Header title="Sổ Điểm & Nhận Xét" showBackIcon={true} onBackClick={goBack} />
 
       <Box p={4} className="pt-20 pb-24">
@@ -253,8 +253,8 @@ function GradesInputPage() {
                       onClick={() => startVoiceInput(student.id, 'comment')}
                       disabled={listening && currentStudentId !== student.id}
                       className={`w-full p-2.5 rounded-lg text-sm font-bold mb-3 transition-all ${listening && currentStudentId === student.id
-                          ? 'bg-yellow-500 text-white border-yellow-500'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                        ? 'bg-yellow-500 text-white border-yellow-500'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                         }`}
                     >
                       {listening && currentStudentId === student.id ? '🎤 Đang nghe...' : '🎤 Nói nhận xét'}

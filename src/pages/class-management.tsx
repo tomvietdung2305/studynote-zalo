@@ -154,46 +154,94 @@ function ClassManagementPage() {
   const dayNames = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
   return (
-    <Page className="bg-gray-100">
+    <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
       <Header title="Quản Lý Lớp Học" showBackIcon={true} onBackClick={goBack} />
 
-      <Box p={4} className="pt-20 pb-32">
+      <Box p={4} className="pb-32">
         {/* List View */}
         {view === 'list' && (
           <Box>
             <div className="flex justify-between items-center mb-4">
               <Text.Title size="small">Danh sách lớp</Text.Title>
-              <Button size="small" icon={<Icon icon="zi-plus" />} onClick={() => { resetForm(); setView('create'); }}>
-                Thêm lớp
-              </Button>
             </div>
 
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-4">
               {classes.map((cls) => (
-                <div
+                <Box
                   key={cls.id}
                   onClick={() => handleEdit(cls)}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-95 transition-transform flex justify-between items-center"
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden active:scale-98 transition-transform"
                 >
-                  <div>
-                    <div className="font-bold text-lg text-blue-800">{cls.name}</div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      📅 {cls.schedules && cls.schedules.length > 0
-                        ? `${cls.schedules.length} buổi/tuần`
-                        : 'Chưa có lịch'}
+                  {/* Card Header - Colored band */}
+                  <div className="h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <Text.Title size="small" className="text-gray-900 mb-1">
+                          {cls.name}
+                        </Text.Title>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <Icon icon="zi-calendar" size={14} />
+                            <span>
+                              {cls.schedules && cls.schedules.length > 0
+                                ? `${cls.schedules.length} buổi/tuần`
+                                : 'Chưa có lịch'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-medium">
+                          {cls.total_students || 0} học sinh
+                        </div>
+                        <Icon icon="zi-chevron-right" className="text-gray-400" />
+                      </div>
                     </div>
+
+                    {/* Schedule preview */}
+                    {cls.schedules && cls.schedules.length > 0 && (
+                      <div className="flex gap-1 mt-2">
+                        {dayNames.map((day, idx) => {
+                          const hasSchedule = cls.schedules?.some(s => s.day_of_week === idx);
+                          return (
+                            <div
+                              key={idx}
+                              className={`text-xs px-2 py-1 rounded ${hasSchedule
+                                  ? 'bg-blue-100 text-blue-700 font-medium'
+                                  : 'bg-gray-100 text-gray-400'
+                                }`}
+                            >
+                              {day}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                      {cls.total_students || 0} HS
-                    </div>
-                    <Icon icon="zi-chevron-right" className="text-gray-400" />
-                  </div>
-                </div>
+                </Box>
               ))}
               {classes.length === 0 && !loading && (
-                <div className="text-center text-gray-500 py-8">Chưa có lớp học nào</div>
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-3">📚</div>
+                  <Text className="text-gray-500">Chưa có lớp học nào</Text>
+                  <Text size="xSmall" className="text-gray-400 mt-1">
+                    Nhấn nút + để tạo lớp mới
+                  </Text>
+                </div>
               )}
+            </div>
+
+            {/* Floating Action Button */}
+            <div className="fixed bottom-24 right-6 z-10">
+              <Button
+                size="large"
+                className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg rounded-full w-14 h-14 flex items-center justify-center"
+                onClick={() => { resetForm(); setView('create'); }}
+              >
+                <Icon icon="zi-plus" size={24} className="text-white" />
+              </Button>
             </div>
           </Box>
         )}

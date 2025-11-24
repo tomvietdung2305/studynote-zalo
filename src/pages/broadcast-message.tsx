@@ -97,26 +97,29 @@ function BroadcastMessagePage() {
   const selectedClassData = classes.find((c) => c.id === selectedClassId);
 
   return (
-    <Page className="bg-gray-100">
+    <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
       <Header title="Gửi Thông Báo" showBackIcon={true} onBackClick={goBack} />
 
-      <Box p={4} className="pt-20 pb-24">
+      <Box p={4} className="pb-24">
         {/* Class Selector */}
         <Box className="mb-6">
           <Text.Title size="small" className="mb-3">Chọn lớp:</Text.Title>
           <div className="grid grid-cols-3 gap-2">
             {classes.map((cls) => (
-              <div
+              <Box
                 key={cls.id}
                 onClick={() => setSelectedClassId(cls.id)}
-                className={`p-3 border rounded-lg cursor-pointer transition-all ${selectedClassId === cls.id
-                  ? 'border-yellow-500 bg-yellow-50'
+                className={`p-3 border rounded-xl cursor-pointer transition-all ${selectedClassId === cls.id
+                  ? 'border-blue-500 bg-blue-50 shadow-sm'
                   : 'border-gray-200 bg-white'
                   }`}
               >
-                <div className="text-sm font-bold mb-1">{cls.name}</div>
-                <div className="text-xs text-gray-500">👨‍👩‍👧‍👦 {cls.total_students || 0}</div>
-              </div>
+                <Text className="font-semibold text-sm mb-1">{cls.name}</Text>
+                <div className="flex items-center gap-1 text-xs text-gray-500">
+                  <Icon icon="zi-user" size={12} />
+                  <span>{cls.total_students || 0}</span>
+                </div>
+              </Box>
             ))}
           </div>
         </Box>
@@ -157,16 +160,18 @@ function BroadcastMessagePage() {
         </Box>
 
         {/* Preview */}
-        {message && (
-          <Box className="mb-6 bg-blue-50 rounded-lg p-3 border border-blue-100">
-            <div className="text-xs font-bold text-blue-800 mb-2">
-              📱 Xem trước (Tin nhắn Zalo):
-            </div>
-            <div className="bg-white rounded-lg p-3 text-sm leading-relaxed border border-blue-100">
-              {message}
-            </div>
-          </Box>
-        )}
+        {
+          message && (
+            <Box className="mb-6 bg-blue-50 rounded-lg p-3 border border-blue-100">
+              <div className="text-xs font-bold text-blue-800 mb-2">
+                📱 Xem trước (Tin nhắn Zalo):
+              </div>
+              <div className="bg-white rounded-lg p-3 text-sm leading-relaxed border border-blue-100">
+                {message}
+              </div>
+            </Box>
+          )
+        }
 
         {/* Debug Section */}
         <Box className="mb-6 bg-gray-200 p-4 rounded-lg">
@@ -199,25 +204,29 @@ function BroadcastMessagePage() {
         </Box>
 
         {/* Success Message */}
-        {sent && (
-          <div className="fixed inset-0 flex items-center justify-center z-[60] pointer-events-none">
-            <div className="bg-green-600 text-white px-8 py-6 rounded-xl shadow-2xl text-center animate-bounce">
-              <div className="text-2xl font-bold mb-2">✅ Đã Gửi!</div>
-              <div className="text-sm">Tới {sent.count} phụ huynh</div>
+        {
+          sent && (
+            <div className="fixed inset-0 flex items-center justify-center z-[60] pointer-events-none">
+              <div className="bg-green-600 text-white px-8 py-6 rounded-xl shadow-2xl text-center animate-bounce">
+                <div className="text-2xl font-bold mb-2">✅ Đã Gửi!</div>
+                <div className="text-sm">Tới {sent.count} phụ huynh</div>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        }
 
         {/* Error Message */}
-        {error && (
-          <div className="fixed inset-0 flex items-center justify-center z-[60] pointer-events-none">
-            <div className="bg-red-600 text-white px-8 py-6 rounded-xl shadow-2xl text-center">
-              <div className="text-xl font-bold">❌ {error}</div>
+        {
+          error && (
+            <div className="fixed inset-0 flex items-center justify-center z-[60] pointer-events-none">
+              <div className="bg-red-600 text-white px-8 py-6 rounded-xl shadow-2xl text-center">
+                <div className="text-xl font-bold">❌ {error}</div>
+              </div>
             </div>
-          </div>
-        )}
-      </Box>
-    </Page>
+          )
+        }
+      </Box >
+    </Page >
   );
 }
 

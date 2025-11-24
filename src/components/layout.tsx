@@ -55,6 +55,8 @@ const LayoutWrapper = () => {
   // On web, show simple login page instead of full app
   if (isWeb()) {
     console.log('[Layout] Web environment detected, showing WebLoginPage');
+    console.log('[Dev Tip] To view mobile UI on desktop, add ?mode=mobile to URL');
+    console.log('[Dev Tip] Example: http://localhost:3000/?mode=mobile');
     return <WebLoginPage />;
   }
 

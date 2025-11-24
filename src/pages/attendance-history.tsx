@@ -39,7 +39,7 @@ function AttendanceHistoryPage() {
   };
 
   return (
-    <Page className="bg-gray-100">
+    <Page className="bg-gray-100" style={{ marginTop: '44px' }}>
       <Header title="Lịch Sử Điểm Danh" showBackIcon={true} onBackClick={goBack} />
 
       <Box p={4} className="pt-20 pb-24">
