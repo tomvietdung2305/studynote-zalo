@@ -7,8 +7,36 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS Configuration - Allow frontend origins
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        // Allow localhost for development
+        if (origin.includes('localhost')) return callback(null, true);
+
+        // Allow Vercel deployments
+        if (origin.includes('vercel.app')) return callback(null, true);
+
+        // Allow specific domains
+        const allowedOrigins = [
+            'https://studynote-frontend-18p0r6ykg-justtoms-projects.vercel.app',
+            'https://studynote-frontend.vercel.app'
+        ];
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(null, true); // Allow all for now
+        }
+    },
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
