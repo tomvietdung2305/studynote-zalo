@@ -54,8 +54,18 @@ function AppContent() {
 }
 
 const LayoutWrapper = () => {
+  let theme: AppProps["theme"] = "light";
+  try {
+    const sysInfo = getSystemInfo();
+    if (sysInfo && sysInfo.zaloTheme) {
+      theme = sysInfo.zaloTheme as AppProps["theme"];
+    }
+  } catch (error) {
+    console.warn("Failed to get system info:", error);
+  }
+
   return (
-    <App theme={getSystemInfo().zaloTheme as AppProps["theme"]}>
+    <App theme={theme}>
       {/* @ts-ignore */}
       <SnackbarProvider>
         <AppProvider>
