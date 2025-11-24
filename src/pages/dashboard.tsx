@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Page, Header, Text, Box, Button, List, Icon, useSnackbar } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
 import { useClasses, useClassStudents } from '@/hooks/useApi';
-import { requestSendNotification } from 'zmp-sdk';
+import { zaloAdapter } from '@/adapters';
 
 const dayNames = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
 
@@ -14,7 +14,7 @@ function DashboardPage() {
 
   const requestNotificationPerm = async () => {
     try {
-      await requestSendNotification({});
+      await zaloAdapter.requestSendNotification({});
       openSnackbar({
         text: "Đã cấp quyền nhận thông báo!",
         type: "success"
@@ -195,8 +195,8 @@ function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <span>{student.name}</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${student.parent_zalo_id
-                        ? 'bg-green-50 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
                       }`}>
                       {student.parent_zalo_id ? '✅ Đã kết nối' : '⏳ Chưa kết nối'}
                     </span>

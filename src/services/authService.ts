@@ -1,4 +1,4 @@
-import { getAccessToken, getUserInfo } from 'zmp-sdk/apis';
+import { zaloAdapter } from '@/adapters';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -48,14 +48,12 @@ export const authService = {
     async login() {
         try {
             console.log('Starting Zalo login...');
-            // Get access token from Zalo
-            const tokenResponse = await getAccessToken({});
-            const accessToken = (tokenResponse as any).accessToken;
+            // Get access token from Zalo via adapter
+            const accessToken = await zaloAdapter.getAccessToken();
             console.log('Got access token');
 
-            // Get user info from Zalo
-            const userResponse = await getUserInfo({});
-            const userInfo = (userResponse as any).userInfo;
+            // Get user info from Zalo via adapter
+            const userInfo = await zaloAdapter.getUserInfo();
             console.log('Got user info:', userInfo);
 
             // Send to backend for authentication

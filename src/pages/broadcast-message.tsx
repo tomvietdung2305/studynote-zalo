@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAppNavigation } from '@/context/AppContext';
 import { useClasses } from '@/hooks/useApi';
 import { Page, Header, Box, Text, Button, Icon, useSnackbar } from 'zmp-ui';
-import { followOA, getUserInfo } from 'zmp-sdk';
+import { zaloAdapter } from '@/adapters';
 
 const broadcastTemplates = [
   { id: '1', title: 'Thông báo sự kiện', text: 'Thân gửi phụ huynh, lớp của chúng ta có sự kiện...' },
@@ -31,11 +31,15 @@ function BroadcastMessagePage() {
   const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
-    getUserInfo({}).then((data) => {
-      setUserId(data.userInfo.id);
-    }).catch((err) => {
-      console.error('Failed to get user info:', err);
-    });
+    // Get user info via adapter (handles both Zalo and Web)
+    zaloAdapter.getUserInfo()
+      .then((data) => {
+        setUserId(data.id);
+      })
+      .catch((err) => {
+        console.warn('Failed to get user info:', err);
+        setUserId('unknown_user');
+      });
   }, []);
 
   const applyTemplate = (text: string) => {
@@ -44,9 +48,7 @@ function BroadcastMessagePage() {
 
   const handleFollowOA = async () => {
     try {
-      await followOA({
-        id: 'YOUR_OA_ID_HERE' // Replace with actual OA ID if known, or remove id param to follow current app's OA
-      });
+      await zaloAdapter.followOA();
       openSnackbar({
         text: "Đã gửi yêu cầu quan tâm OA",
         type: "success"

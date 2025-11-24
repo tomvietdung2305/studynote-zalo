@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Page, Header, Text, Box, Button, Input, useSnackbar, Icon } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
-import { requestSendNotification } from 'zmp-sdk';
+import { zaloAdapter } from '@/adapters';
 import { useAtom } from 'jotai';
 import { isAuthenticatedAtom } from '@/store/authAtoms';
 import { authService } from '@/services/authService';
@@ -28,7 +28,7 @@ function ParentConnectPage() {
 
             // Request Notification Permission immediately
             try {
-                await requestSendNotification({});
+                await zaloAdapter.requestSendNotification({});
                 openSnackbar({ text: 'Đã đăng ký nhận thông báo', type: 'success' });
             } catch (e) {
                 console.error('Permission denied', e);

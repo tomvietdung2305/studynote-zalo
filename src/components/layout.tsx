@@ -1,5 +1,5 @@
-import { getSystemInfo } from "zmp-sdk";
 import { App, SnackbarProvider, Box, ZMPRouter } from "zmp-ui";
+import { zaloAdapter } from "@/adapters";
 import { AppProps } from "zmp-ui/app";
 import { AppProvider, useAppNavigation, type PageName } from "@/context/AppContext";
 import { Navigation } from "@/components/navigation";
@@ -54,15 +54,7 @@ function AppContent() {
 }
 
 const LayoutWrapper = () => {
-  let theme: AppProps["theme"] = "light";
-  try {
-    const sysInfo = getSystemInfo();
-    if (sysInfo && sysInfo.zaloTheme) {
-      theme = sysInfo.zaloTheme as AppProps["theme"];
-    }
-  } catch (error) {
-    console.warn("Failed to get system info:", error);
-  }
+  const theme: AppProps["theme"] = zaloAdapter.getTheme();
 
   return (
     <App theme={theme}>
