@@ -1,6 +1,7 @@
 import { zaloAdapter } from '@/adapters';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://studynote-server-db5cnonxi-justtoms-projects.vercel.app/api';
+
 
 export const authService = {
     // Dev login for localhost testing (bypass Zalo SDK)
