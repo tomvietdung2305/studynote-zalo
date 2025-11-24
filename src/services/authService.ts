@@ -1,6 +1,7 @@
 import { zaloAdapter } from '@/adapters';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://studynote-server-bkrn337w2-justtoms-projects.vercel.app/api';
+// Prioritize localhost for development, fallback to Vercel
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 
 
