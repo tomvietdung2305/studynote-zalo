@@ -18,6 +18,7 @@ const attendanceRoutes = require('./src/routes/attendance');
 const gradesRoutes = require('./src/routes/grades');
 const notificationRoutes = require('./src/routes/notifications');
 const parentRoutes = require('./src/routes/parents');
+const webhookRoutes = require('./src/routes/webhook');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
@@ -25,6 +26,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/grades', gradesRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/parents', parentRoutes);
+app.use('/webhook', webhookRoutes);
 
 // Basic Route
 app.get('/', (req, res) => {
