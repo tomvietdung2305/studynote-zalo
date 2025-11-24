@@ -3,26 +3,102 @@
  * Plain HTML/CSS login page for web environment
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
 
 export const WebLoginPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    // Check if already logged in
+    useEffect(() => {
+        const token = authService.getToken();
+        if (token) {
+            setIsAuthenticated(true);
+        }
+    }, []);
 
     const handleDevLogin = async () => {
         try {
             setLoading(true);
             setError(null);
-            await authService.devLogin();
-            // Reload to trigger auth check
-            window.location.reload();
+            console.log('[WebLogin] Starting dev login...');
+
+            const result = await authService.devLogin();
+            console.log('[WebLogin] Login successful:', result);
+
+            // Set authenticated state
+            setIsAuthenticated(true);
+
+            // Show success message briefly before reload
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (err: any) {
-            setError(err.message || 'Login failed');
+            console.error('[WebLogin] Login failed:', err);
+            setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
     };
+
+    // If authenticated, show dashboard message
+    if (isAuthenticated) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+            }}>
+                <div style={{
+                    background: 'white',
+                    borderRadius: '16px',
+                    padding: '48px',
+                    maxWidth: '500px',
+                    width: '90%',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                    textAlign: 'center'
+                }}>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        background: '#48bb78',
+                        borderRadius: '50%',
+                        margin: '0 auto 24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '48px'
+                    }}>
+                        ✅
+                    </div>
+                    <h1 style={{ margin: 0, fontSize: '28px', color: '#1a202c', marginBottom: '16px' }}>
+                        Đăng nhập thành công!
+                    </h1>
+                    <p style={{ margin: 0, color: '#718096', fontSize: '16px', lineHeight: '1.6' }}>
+                        Bạn đã đăng nhập vào chế độ Web Demo.<br />
+                        Để sử dụng đầy đủ tính năng, vui lòng truy cập qua Zalo Mini App.
+                    </p>
+                    <div style={{
+                        marginTop: '32px',
+                        padding: '16px',
+                        background: '#f7fafc',
+                        borderRadius: '8px',
+                        border: '1px solid #e2e8f0'
+                    }}>
+                        <p style={{ margin: 0, fontSize: '14px', color: '#4a5568' }}>
+                            <strong>Lưu ý:</strong> Phiên bản web chỉ hỗ trợ xem dữ liệu cơ bản.
+                            Các tính năng như điểm danh, gửi thông báo chỉ khả dụng trong Zalo Mini App.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -115,3 +191,4 @@ export const WebLoginPage: React.FC = () => {
         </div>
     );
 };
+
