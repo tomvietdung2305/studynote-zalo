@@ -1,7 +1,7 @@
 import { zaloAdapter } from '@/adapters';
 
-// Prioritize localhost for development, fallback to Vercel
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// Use localtunnel HTTPS URL to avoid Mixed Content error on mobile
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://stupid-steaks-stick.loca.lt/api';
 
 
 
