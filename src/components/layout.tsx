@@ -60,6 +60,8 @@ function AppContent() {
   );
 }
 
+import { MockZMPRouter } from "@/components/MockComponents";
+
 const LayoutWrapper = () => {
   // In Zalo, show full app with ZMP UI components
   const theme = zaloAdapter.getTheme();
@@ -72,11 +74,19 @@ const LayoutWrapper = () => {
       {/* @ts-ignore */}
       <SnackbarProvider>
         <AppProvider>
-          <ZMPRouter>
-            <AuthWrapper>
-              <AppContent />
-            </AuthWrapper>
-          </ZMPRouter>
+          {isWebEnv ? (
+            <MockZMPRouter>
+              <AuthWrapper>
+                <AppContent />
+              </AuthWrapper>
+            </MockZMPRouter>
+          ) : (
+            <ZMPRouter>
+              <AuthWrapper>
+                <AppContent />
+              </AuthWrapper>
+            </ZMPRouter>
+          )}
         </AppProvider>
       </SnackbarProvider>
     </PlatformApp>
