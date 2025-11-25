@@ -1,5 +1,4 @@
 import React, { createContext, useContext } from 'react';
-import { SnackbarProvider, useSnackbar as useZmpSnackbar } from 'zmp-ui';
 import { isWeb } from '@/utils/platform';
 
 // --- Mock Implementation for Web ---
@@ -53,15 +52,17 @@ const MockToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 };
 
 // --- Unified Provider ---
-interface UnifiedToastContextType {
+export interface UnifiedToastContextType {
     openSnackbar: (props: any) => void;
     closeSnackbar: () => void;
 }
 
-const UnifiedToastContext = createContext<UnifiedToastContextType | undefined>(undefined);
+export const UnifiedToastContext = createContext<UnifiedToastContextType | undefined>(undefined);
 
 export const AppToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    if (isWeb()) {
+    const webEnv = isWeb();
+
+    if (webEnv) {
         return (
             <MockToastProvider>
                 <WebToastAdapter>{children}</WebToastAdapter>
@@ -69,28 +70,31 @@ export const AppToastProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         );
     }
 
+    // For Zalo: Use React.lazy to prevent zmp-ui from being bundled in web build
+    const ZaloWrapper = React.lazy(() =>
+        import('./ZaloToastWrapper').catch(() => ({
+            default: ({ children: kids }: { children: React.ReactNode }) => <>{kids}</>
+        }))
+    );
+
     return (
-        /* @ts-ignore */
-        <SnackbarProvider>
-            <ZaloToastAdapter>{children}</ZaloToastAdapter>
-        </SnackbarProvider>
+        <React.Suspense fallback={<div style={{ padding: 20 }}>Loading...</div>}>
+            <ZaloWrapper>{children}</ZaloWrapper>
+        </React.Suspense>
     );
 };
 
 // Adapters to bridge specific providers to UnifiedContext
 const WebToastAdapter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { openToast, closeToast } = useContext(MockToastContext)!;
+    const context = useContext(MockToastContext);
+    if (!context) {
+        console.error('[WebToastAdapter] MockToastContext not found');
+        return <>{children}</>;
+    }
+
+    const { openToast, closeToast } = context;
     return (
         <UnifiedToastContext.Provider value={{ openSnackbar: openToast, closeSnackbar: closeToast }}>
-            {children}
-        </UnifiedToastContext.Provider>
-    );
-};
-
-const ZaloToastAdapter: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { openSnackbar, closeSnackbar } = useZmpSnackbar();
-    return (
-        <UnifiedToastContext.Provider value={{ openSnackbar, closeSnackbar }}>
             {children}
         </UnifiedToastContext.Provider>
     );
