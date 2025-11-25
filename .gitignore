@@ -6,3 +6,4 @@ dist
 build
 .vercel
 serviceAccountKey.json
+server/config/service-account.json

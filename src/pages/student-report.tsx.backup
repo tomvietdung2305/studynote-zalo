@@ -1,0 +1,450 @@
+```
+import { useState, useEffect } from 'react';
+import { Page, Header, Box, Text, Button, Avatar, Icon } from 'zmp-ui';
+import { apiService } from '@/services/apiService';
+import { useAppNavigation } from '@/context/AppContext';
+
+// Types
+interface Student {
+    id: string;
+    name: string;
+    className: string;
+}
+
+interface Report {
+    reportId: string;
+    enhancedReport: string;
+    sections: {
+        strengths?: string[];
+        improvements?: string[];
+        actionPlan?: {
+            forStudent?: string[];
+            forParent?: string[];
+        };
+        resources?: string[];
+    };
+}
+
+interface ReportHistory {
+    id: string;
+    teacher_note: string;
+    created_at: string;
+}
+
+function StudentReportPage() {
+    const { goBack, params } = useAppNavigation();
+    const studentId = params?.studentId;
+
+    const [student, setStudent] = useState<Student | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [generating, setGenerating] = useState(false);
+    const [note, setNote] = useState('');
+    const [report, setReport] = useState<Report | null>(null);
+    const [recentReports, setRecentReports] = useState<ReportHistory[]>([]);
+    const [showHistory, setShowHistory] = useState(false);
+
+    // Load student data
+    useEffect(() => {
+        if (studentId) {
+            loadStudentData();
+            loadRecentReports();
+        }
+    }, [studentId]);
+
+    const loadStudentData = async () => {
+        if (!studentId) return;
+        try {
+            setLoading(true);
+            const data = await apiService.getStudentById(studentId);
+            setStudent(data);
+        } catch (error) {
+            console.error('Load student error:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadRecentReports = async () => {
+        if (!studentId) return;
+        try {
+            const data = await apiService.getStudentReports(studentId, 5);
+            setRecentReports(data.reports || []);
+        } catch (error) {
+            console.error('Load reports error:', error);
+        }
+    };
+
+    const handleGenerate = async () => {
+        if (!studentId || !note.trim() || note.trim().length < 10) {
+            alert('Vui lòng nhập nhận xét (tối thiểu 10 ký tự)');
+            return;
+        }
+
+        try {
+            setGenerating(true);
+            const result = await apiService.generateReport({
+                studentId,
+                teacherNote: note,
+                options: {
+                    tone: 'encouraging',
+                    includeActionPlan: true
+                }
+            });
+
+            setReport(result);
+            setNote(''); // Clear input after success
+        } catch (error) {
+            console.error('Generate error:', error);
+            alert('Lỗi khi tạo báo cáo. Vui lòng thử lại.');
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    const handleSave = async () => {
+        // Report is already saved from backend
+        alert('Báo cáo đã được lưu!');
+        setReport(null);
+        loadRecentReports(); // Reload to show new report
+    };
+
+    const handleSendToParent = async () => {
+        if (!report) return;
+        try {
+            await apiService.sendReportToParent(report.reportId);
+            alert('Đã gửi báo cáo đến phụ huynh!');
+            setReport(null);
+            loadRecentReports();
+        } catch (error) {
+            console.error('Send error:', error);
+            alert('Lỗi khi gửi báo cáo');
+        }
+    };
+
+    const quickSuggestions = [
+        "Học tốt, cần cải thiện...",
+        "Tiến bộ rõ rệt",
+        "Cần chú ý hơn",
+        "Tích cực tham gia",
+        "Toán tốt, văn yếu"
+    ];
+
+    if (loading) {
+        return (
+            <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+                <Header title="Báo cáo học tập" showBackIcon onBackClick={goBack} />
+                <Box p={4} className="flex justify-center items-center" style={{ minHeight: '50vh' }}>
+                    <Text>Đang tải...</Text>
+                </Box>
+            </Page>
+        );
+    }
+
+    return (
+        <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+            <Header title="Báo cáo học tập" showBackIcon onBackClick={goBack} />
+
+            <Box className="pb-24">
+                {/* Student Info Card */}
+                <Box className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 mb-4">
+                    <div className="flex items-center gap-4">
+                        <Avatar size={56} className="border-2 border-white bg-white">
+                            <span className="text-blue-600 text-xl font-bold">
+                                {student?.name?.[0]}
+                            </span>
+                        </Avatar>
+                        <div className="flex-1">
+                            <Text.Title className="text-white mb-1">
+                                {student?.name}
+                            </Text.Title>
+                            <Text size="small" className="text-blue-100">
+                                Lớp {student?.className}
+                            </Text>
+                        </div>
+                        <button
+                            onClick={() => setShowHistory(!showHistory)}
+                            className="p-2 bg-white/20 rounded-full"
+                        >
+                            <Icon icon="zi-notif" className="text-white" size={20} />
+                        </button>
+                    </div>
+                </Box>
+
+                {/* History Section */}
+                {showHistory && recentReports.length > 0 && (
+                    <Box className="px-4 mb-4">
+                        <Box className="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div className="p-3 bg-gray-50 border-b">
+                                <Text className="font-semibold text-gray-700">
+                                    📚 Báo cáo gần đây
+                                </Text>
+                            </div>
+                            {recentReports.map((r) => (
+                                <div
+                                    key={r.id}
+                                    className="p-3 border-b last:border-0 cursor-pointer hover:bg-gray-50"
+                                    onClick={() => navigate(`/ report / ${ r.id } `)}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex-1">
+                                            <Text size="small" className="text-gray-600">
+                                                {new Date(r.created_at).toLocaleDateString('vi-VN')}
+                                            </Text>
+                                            <Text className="mt-1 text-gray-700">
+                                                {r.teacher_note.substring(0, 60)}...
+                                            </Text>
+                                        </div>
+                                        <Icon icon="zi-chevron-right" className="text-gray-400" />
+                                    </div>
+                                </div>
+                            ))}
+                        </Box>
+                    </Box>
+                )}
+
+                {/* Main Input Area */}
+                {!report && (
+                    <Box p={4}>
+                        {/* Quick Input */}
+                        <Box className="bg-white rounded-2xl shadow-sm p-4 mb-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-xl">✨</span>
+                                </div>
+                                <div>
+                                    <Text.Title size="small">Nhận xét của cô</Text.Title>
+                                    <Text size="xSmall" className="text-gray-500">
+                                        Ghi ngắn gọn, AI sẽ mở rộng thành báo cáo chi tiết
+                                    </Text>
+                                </div>
+                            </div>
+
+                            <textarea
+                                placeholder="VD: Em học khá, toán tốt nhưng văn yếu..."
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                className="w-full p-3 border border-gray-200 rounded-xl text-sm"
+                                rows={4}
+                                maxLength={200}
+                            />
+
+                            <div className="flex justify-between items-center mt-2">
+                                <Text size="xSmall" className="text-gray-400">
+                                    {note.length}/200 ký tự
+                                </Text>
+                                {note.length >= 10 && (
+                                    <Text size="xSmall" className="text-green-600 flex items-center gap-1">
+                                        <Icon icon="zi-check-circle" size={14} />
+                                        Đủ để tạo báo cáo
+                                    </Text>
+                                )}
+                            </div>
+                        </Box>
+
+                        {/* Quick Suggestions */}
+                        <Box className="mb-4">
+                            <Text size="small" className="mb-2 text-gray-600 px-1">
+                                💡 Gợi ý nhanh:
+                            </Text>
+                            <div className="flex flex-wrap gap-2">
+                                {quickSuggestions.map((suggestion, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setNote(suggestion)}
+                                        className="px-3 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
+                            </div>
+                        </Box>
+
+                        {/* Generate Button */}
+                        <Button
+                            fullWidth
+                            size="large"
+                            onClick={handleGenerate}
+                            disabled={!note.trim() || note.trim().length < 10 || generating}
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 mb-4"
+                        >
+                            {generating ? (
+                                <div className="flex items-center justify-center gap-2">
+                                    <Icon icon="zi-notif" className="animate-spin" />
+                                    <span>Đang tạo báo cáo...</span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-2">
+                                    <span>✨</span>
+                                    <span>Tạo báo cáo AI</span>
+                                </div>
+                            )}
+                        </Button>
+
+                        {/* Info Card */}
+                        <Box className="bg-blue-50 rounded-xl p-3 border border-blue-100">
+                            <div className="flex gap-2">
+                                <Icon icon="zi-info-circle" className="text-blue-600" size={20} />
+                                <div className="flex-1">
+                                    <Text size="xSmall" className="text-blue-800">
+                                        AI sẽ tạo báo cáo chi tiết bao gồm:
+                                    </Text>
+                                    <ul className="mt-1 text-xs text-blue-700 space-y-0.5">
+                                        <li>• Điểm mạnh và cần cải thiện</li>
+                                        <li>• Đề xuất cho học sinh và phụ huynh</li>
+                                        <li>• Tài liệu học tập phù hợp</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </Box>
+                    </Box>
+                )}
+
+                {/* AI Report Display */}
+                {report && (
+                    <Box p={4}>
+                        <Box className="bg-white rounded-2xl shadow-lg overflow-hidden mb-4">
+                            {/* Report Header */}
+                            <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                            <span className="text-2xl">📊</span>
+                                        </div>
+                                        <div>
+                                            <Text.Title size="small" className="text-white">
+                                                Báo cáo AI
+                                            </Text.Title>
+                                            <Text size="xSmall" className="text-blue-100">
+                                                {new Date().toLocaleDateString('vi-VN')}
+                                            </Text>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setReport(null)}
+                                        className="p-2 bg-white/20 rounded-full"
+                                    >
+                                        <Icon icon="zi-close" className="text-white" size={20} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Report Content */}
+                            <div className="p-4">
+                                {/* Strengths */}
+                                {report.sections?.strengths?.length > 0 && (
+                                    <div className="mb-4">
+                                        <Text className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                                            <span>✨</span> Điểm mạnh
+                                        </Text>
+                                        <ul className="space-y-1">
+                                            {report.sections.strengths.map((item, idx) => (
+                                                <li key={idx} className="text-sm text-gray-700 flex gap-2">
+                                                    <span className="text-green-500">•</span>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Improvements */}
+                                {report.sections?.improvements?.length > 0 && (
+                                    <div className="mb-4 pb-4 border-b">
+                                        <Text className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                                            <span>⚠️</span> Cần cải thiện
+                                        </Text>
+                                        <ul className="space-y-1">
+                                            {report.sections.improvements.map((item, idx) => (
+                                                <li key={idx} className="text-sm text-gray-700 flex gap-2">
+                                                    <span className="text-orange-500">•</span>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Action Plans */}
+                                {(report.sections?.actionPlan?.forStudent?.length > 0 ||
+                                    report.sections?.actionPlan?.forParent?.length > 0) && (
+                                        <div className="mb-4">
+                                            <Text className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                                <span>💡</span> Đề xuất cải thiện
+                                            </Text>
+
+                                            {/* For Student */}
+                                            {report.sections.actionPlan.forStudent?.length > 0 && (
+                                                <div className="mb-3">
+                                                    <Text size="small" className="font-medium text-blue-600 mb-1 flex items-center gap-1">
+                                                        <span>📚</span> Cho em:
+                                                    </Text>
+                                                    <ul className="space-y-1 ml-5">
+                                                        {report.sections.actionPlan.forStudent.map((item, idx) => (
+                                                            <li key={idx} className="text-sm text-gray-700">
+                                                                {idx + 1}. {item}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {/* For Parent */}
+                                            {report.sections.actionPlan.forParent?.length > 0 && (
+                                                <div className="mb-3">
+                                                    <Text size="small" className="font-medium text-purple-600 mb-1 flex items-center gap-1">
+                                                        <span>👨‍👩‍👧</span> Cho phụ huynh:
+                                                    </Text>
+                                                    <ul className="space-y-1 ml-5">
+                                                        {report.sections.actionPlan.forParent.map((item, idx) => (
+                                                            <li key={idx} className="text-sm text-gray-700">
+                                                                {idx + 1}. {item}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                {/* Resources */}
+                                {report.sections?.resources?.length > 0 && (
+                                    <div className="bg-gray-50 rounded-xl p-3">
+                                        <Text size="small" className="font-medium text-gray-700 mb-2 flex items-center gap-1">
+                                            <span>📖</span> Tài liệu tham khảo:
+                                        </Text>
+                                        <ul className="space-y-1">
+                                            {report.sections.resources.map((item, idx) => (
+                                                <li key={idx} className="text-xs text-gray-600 flex gap-2">
+                                                    <span>•</span>
+                                                    <span>{item}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="p-4 bg-gray-50 border-t flex gap-2">
+                                <Button
+                                    onClick={handleSave}
+                                    className="flex-1 bg-blue-500"
+                                >
+                                    💾 Lưu báo cáo
+                                </Button>
+                                <Button
+                                    onClick={handleSendToParent}
+                                    className="flex-1 bg-purple-500"
+                                >
+                                    📤 Gửi phụ huynh
+                                </Button>
+                            </div>
+                        </Box>
+                    </Box>
+                )}
+            </Box>
+        </Page>
+    );
+}
+
+export default StudentReportPage;

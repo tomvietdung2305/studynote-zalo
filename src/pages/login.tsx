@@ -135,7 +135,7 @@ function LoginPage() {
                         variant="secondary"
                         className="mt-3"
                     >
-                        🔧 Dev Login (Localhost Only)
+                        🔧 Dev Login (Demo Mode)
                     </Button>
 
                     {/* Footer */}

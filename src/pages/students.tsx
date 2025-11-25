@@ -1,92 +1,130 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Page, Header, Box, Text, Input, Icon } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
+import { apiService } from '@/services/apiService';
 
-const mockStudents = [
-  { id: '1', name: 'Nguyễn Văn A', class: '10A', gradeAverage: 8.5, attendanceRate: 95 },
-  { id: '2', name: 'Trần Thị B', class: '10A', gradeAverage: 9.0, attendanceRate: 98 },
-  { id: '3', name: 'Lê Văn C', class: '10B', gradeAverage: 7.5, attendanceRate: 90 },
-  { id: '4', name: 'Phạm Thị D', class: '10B', gradeAverage: 8.8, attendanceRate: 100 },
-  { id: '5', name: 'Hoàng Văn E', class: '10C', gradeAverage: 7.0, attendanceRate: 85 },
-];
-
-function StudentListPage() {
-  const { navigateTo } = useAppNavigation();
+function StudentsPage() {
+  const { goBack, navigateTo } = useAppNavigation();
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading] = useState(false);
 
-  const filteredStudents = mockStudents.filter((student) =>
-    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.class.toLowerCase().includes(searchQuery.toLowerCase())
+  useEffect(() => {
+    loadStudents();
+  }, []);
+
+  const loadStudents = async () => {
+    try {
+      setLoading(true);
+      // Get all classes first
+      const classesData = await apiService.getClasses();
+
+      // Get students from all classes
+      const allStudents: any[] = [];
+      for (const cls of classesData.classes || []) {
+        try {
+          const studentsData = await apiService.getClassStudents(cls.id);
+          const studentsWithClass = (studentsData.students || []).map((s: any) => ({
+            ...s,
+            className: cls.name,
+            classId: cls.id
+          }));
+          allStudents.push(...studentsWithClass);
+        } catch (err) {
+          console.error(`Failed to load students for class ${cls.id}:`, err);
+        }
+      }
+
+      setStudents(allStudents);
+    } catch (error) {
+      console.error('Failed to load students:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStudents = students.filter(s =>
+    s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.className?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div style={{ background: '#f3f4f6', width: '100%', minHeight: '100vh', padding: '16px', paddingBottom: '96px' }}>
-      <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>Danh sách học sinh</h2>
-      <input
-        type="text"
-        placeholder="Tìm kiếm theo tên hoặc lớp..."
-        onChange={(e) => setSearchQuery(e.target.value)}
-        value={searchQuery}
-        style={{
-          width: '100%',
-          padding: '10px 12px',
-          borderRadius: '6px',
-          border: '1px solid #ddd',
-          marginBottom: '16px',
-          fontSize: '14px'
-        }}
-      />
+    <Page className="bg-gray-50" style={{ marginTop: '44px' }}>
+      <Header title="Danh sách học sinh" showBackIcon onBackClick={goBack} />
 
-      {filteredStudents.length === 0 ? (
-        <div style={{ textAlign: 'center', paddingTop: '40px', color: '#999' }}>
-          <div style={{ fontSize: '48px', marginBottom: '8px' }}>🔍</div>
-          <div style={{ fontSize: '16px', fontWeight: 'bold' }}>Không tìm thấy học sinh</div>
-          <div style={{ fontSize: '14px', marginTop: '4px' }}>Thử tìm kiếm với từ khóa khác</div>
-        </div>
-      ) : (
-        <div>
-          {filteredStudents.map((student) => (
-            <div
-              key={student.id}
-              onClick={() => navigateTo('student-detail', { studentId: student.id, student })}
-              style={{
-                background: 'white',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                marginBottom: '12px',
-                border: '1px solid #ddd',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                if (e.currentTarget) {
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (e.currentTarget) {
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }
-              }}
-            >
-              <div style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '4px' }}>{student.name}</div>
-              <div style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>Lớp {student.class}</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <div style={{ fontSize: '12px', background: '#dbeafe', color: '#2563eb', padding: '4px 8px', borderRadius: '4px' }}>
-                  Điểm TB: {student.gradeAverage}
+      <Box className="p-4">
+        {/* Search */}
+        <Box className="mb-4">
+          <Input
+            placeholder="Tìm kiếm học sinh..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-white"
+            prefix={<Icon icon="zi-search" />}
+          />
+        </Box>
+
+        {/* Loading */}
+        {loading && (
+          <div className="text-center py-12">
+            <Text className="text-gray-600">Đang tải...</Text>
+          </div>
+        )}
+
+        {/* Student List */}
+        {!loading && filteredStudents.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-5xl mb-3">👥</div>
+            <Text className="text-gray-600">
+              {searchQuery ? 'Không tìm thấy học sinh' : 'Chưa có học sinh nào'}
+            </Text>
+            <Text size="xSmall" className="text-gray-500 mt-1">
+              Thêm học sinh từ trang Quản lý lớp
+            </Text>
+          </div>
+        )}
+
+        {!loading && filteredStudents.length > 0 && (
+          <div className="space-y-2">
+            {filteredStudents.map((student) => (
+              <Box
+                key={student.id}
+                className="bg-white rounded-xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => {
+                  navigateTo('student-detail', { student });
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {student.name?.[0] || '?'}
+                  </div>
+                  <div className="flex-1">
+                    <Text className="font-semibold text-gray-900 mb-1">
+                      {student.name}
+                    </Text>
+                    <Text size="xSmall" className="text-gray-600">
+                      Lớp {student.className}
+                    </Text>
+                  </div>
+                  <Icon icon="zi-chevron-right" className="text-gray-400" />
                 </div>
-                <div style={{ fontSize: '12px', background: '#dcfce7', color: '#16a34a', padding: '4px 8px', borderRadius: '4px' }}>
-                  Điểm danh: {student.attendanceRate}%
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+              </Box>
+            ))}
+          </div>
+        )}
+
+        {/* Stats */}
+        {!loading && students.length > 0 && (
+          <Box className="mt-4 bg-blue-50 rounded-xl p-3">
+            <Text size="xSmall" className="text-blue-800 text-center">
+              📊 Tổng số: {students.length} học sinh
+              {searchQuery && ` • Tìm thấy: ${filteredStudents.length}`}
+            </Text>
+          </Box>
+        )}
+      </Box>
+    </Page>
   );
 }
 
-export default StudentListPage;
+export default StudentsPage;

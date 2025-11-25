@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type PageName = 'dashboard' | 'quick-attendance' | 'grades-input' | 'broadcast-message' | 'student-detail' | 'class-management' | 'attendance-history' | 'parent-connect' | 'parent-dashboard';
+export type PageName = 'dashboard' | 'students' | 'quick-attendance' | 'grades-input' | 'broadcast-message' | 'student-detail' | 'student-report' | 'class-management' | 'attendance-history' | 'parent-connect' | 'parent-dashboard';
 
 interface AppContextType {
   currentPage: PageName;

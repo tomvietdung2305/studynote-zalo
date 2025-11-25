@@ -35,7 +35,7 @@ const mockComments = [
 ];
 
 function StudentDetailPage() {
-  const { goBack, params } = useAppNavigation();
+  const { goBack, navigateTo, params } = useAppNavigation();
   const student = params?.student || { id: '1', name: 'Nguyễn Văn A', class: '10A', gradeAverage: 8.5, attendanceRate: 95 };
 
   return (
@@ -160,11 +160,29 @@ function StudentDetailPage() {
         </div>
       </div>
 
-      {/* Message Button */}
-      <div style={{ position: 'fixed', bottom: '80px', left: '16px', right: '16px' }}>
+      {/* Action Buttons */}
+      <div style={{ position: 'fixed', bottom: '80px', left: '16px', right: '16px', display: 'flex', gap: '8px' }}>
+        <button
+          onClick={() => {
+            navigateTo('student-report', { studentId: student.id });
+          }}
+          style={{
+            flex: 1,
+            padding: '12px 16px',
+            background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+        >
+          ✨ Báo cáo AI
+        </button>
         <button
           style={{
-            width: '100%',
+            flex: 1,
             padding: '12px 16px',
             background: '#2563eb',
             color: 'white',
@@ -175,7 +193,7 @@ function StudentDetailPage() {
             cursor: 'pointer',
           }}
         >
-          💬 Gửi tin nhắn cho phụ huynh
+          💬 Tin nhắn
         </button>
       </div>
     </div>

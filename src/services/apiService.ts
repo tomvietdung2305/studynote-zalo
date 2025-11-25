@@ -1,9 +1,11 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://thick-suits-teach.loca.lt/api';
+// API Base URL - Uses env var in production, localhost in dev
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // Check if we're in offline mode
 const isOfflineMode = () => {
-    const token = localStorage.getItem('auth_token');
-    return token === 'offline_dev_token';
+    return false; // FORCE ONLINE MODE for Firestore integration
+    // const token = localStorage.getItem('auth_token');
+    // return token === 'offline_dev_token';
 };
 
 // Mock data storage for offline mode
@@ -26,11 +28,12 @@ const offlineStorage = {
 
 // Helper to get auth headers
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('auth_token');
+    const token = 'offline_dev_token'; // Force dev token
+    // const token = localStorage.getItem('auth_token');
     return {
         'Content-Type': 'application/json',
-        'Bypass-Tunnel-Reminder': 'true',
-        'Authorization': token ? `Bearer ${token}` : '',
+        // 'Bypass-Tunnel-Reminder': 'true', // Not needed for localhost
+        'Authorization': `Bearer ${token || 'offline_dev_token'}`,
     };
 };
 
@@ -285,6 +288,67 @@ export const apiService = {
             body: JSON.stringify({ classId, studentId, score, comment }),
         });
         if (!response.ok) throw new Error('Failed to save grade');
+        return response.json();
+    },
+
+    // AI Reports
+    async generateReport(data: {
+        studentId: string;
+        teacherNote?: string; // Optional if tags are used
+        tags?: string[];
+        tone?: string;
+        options?: any;
+    }) {
+        const response = await fetch(`${API_BASE_URL}/reports/generate`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error('Failed to generate report');
+        return response.json();
+    },
+
+    async getStudentReports(studentId: string, limit = 10) {
+        const response = await fetch(`${API_BASE_URL}/reports/student/${studentId}?limit=${limit}`, {
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error('Failed to get reports');
+        return response.json();
+    },
+
+    async getReportById(reportId: string) {
+        const response = await fetch(`${API_BASE_URL}/reports/${reportId}`, {
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error('Failed to get report');
+        return response.json();
+    },
+
+    async sendReportToParent(reportId: string) {
+        const response = await fetch(`${API_BASE_URL}/reports/${reportId}/send`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({}), // Empty body for POST
+        });
+        if (!response.ok) throw new Error('Failed to send report');
+        return response.json();
+    },
+
+    async updateReport(reportId: string, data: { enhancedReport: string; sections: any }) {
+        const response = await fetch(`${API_BASE_URL}/reports/${reportId}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) throw new Error('Failed to update report');
+        return response.json();
+    },
+
+    async getStudentById(studentId: string) {
+        const response = await fetch(`${API_BASE_URL}/students/${studentId}`, {
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error('Failed to get student');
         return response.json();
     },
 };

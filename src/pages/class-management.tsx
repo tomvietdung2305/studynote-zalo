@@ -209,8 +209,8 @@ function ClassManagementPage() {
                             <div
                               key={idx}
                               className={`text-xs px-2 py-1 rounded ${hasSchedule
-                                  ? 'bg-blue-100 text-blue-700 font-medium'
-                                  : 'bg-gray-100 text-gray-400'
+                                ? 'bg-blue-100 text-blue-700 font-medium'
+                                : 'bg-gray-100 text-gray-400'
                                 }`}
                             >
                               {day}
@@ -226,7 +226,7 @@ function ClassManagementPage() {
                 <div className="text-center py-12">
                   <div className="text-5xl mb-3">📚</div>
                   <Text className="text-gray-500">Chưa có lớp học nào</Text>
-                  <Text size="xSmall" className="text-gray-400 mt-1">
+                  <Text size="xSmall" className="text-gray-600 mt-1">
                     Nhấn nút + để tạo lớp mới
                   </Text>
                 </div>
@@ -419,13 +419,13 @@ function ClassManagementPage() {
                 </div>
 
                 {loadingStudents ? (
-                  <div className="text-center py-4 text-gray-500">Đang tải danh sách...</div>
+                  <div className="text-center py-4 text-gray-600">Đang tải danh sách...</div>
                 ) : (
                   <div className="bg-gray-50 rounded-lg p-2 max-h-60 overflow-y-auto border border-gray-200">
                     {students.map((student: any) => (
                       <div key={student.id} className="flex justify-between items-center p-2 border-b border-gray-200 last:border-0">
                         <div>
-                          <div className="font-medium text-sm">{student.name}</div>
+                          <div className="font-medium text-sm text-gray-900">{student.name}</div>
                           {student.parent_zalo_id && <div className="text-xs text-green-600">✅ Đã kết nối</div>}
                         </div>
                         <div className="text-right">
@@ -434,12 +434,12 @@ function ClassManagementPage() {
                               {student.connection_code}
                             </div>
                           ) : (
-                            <div className="text-xs text-gray-400">Chưa có mã</div>
+                            <div className="text-xs text-gray-600">Chưa có mã</div>
                           )}
                         </div>
                       </div>
                     ))}
-                    {students.length === 0 && <div className="text-center text-gray-400 py-2">Chưa có học sinh</div>}
+                    {students.length === 0 && <div className="text-center text-gray-600 py-2">Chưa có học sinh</div>}
                   </div>
                 )}
 

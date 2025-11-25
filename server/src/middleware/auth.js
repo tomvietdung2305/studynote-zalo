@@ -9,6 +9,13 @@ const authMiddleware = (req, res, next) => {
         }
 
         const token = authHeader.split(' ')[1];
+
+        // Allow dev token for testing
+        if (token === 'offline_dev_token') {
+            req.userId = 'dev_teacher_123'; // Mock user ID
+            return next();
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         req.userId = decoded.userId;

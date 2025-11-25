@@ -41,31 +41,31 @@ function DashboardPage() {
   // Action buttons
   const actions: ActionItem[] = [
     {
+      id: 'students',
+      icon: 'zi-user',
+      label: 'Học sinh',
+      onClick: () => navigateTo('students'),
+      color: 'green',
+    },
+    {
       id: 'attendance',
       icon: 'zi-check-circle',
       label: 'Điểm danh',
       onClick: () => navigateTo('quick-attendance'),
-      color: 'green',
+      color: 'blue',
     },
     {
       id: 'classes',
       icon: 'zi-list-1',
       label: 'Quản lý lớp',
       onClick: () => navigateTo('class-management'),
-      color: 'blue',
+      color: 'orange',
     },
     {
       id: 'grades',
       icon: 'zi-star',
       label: 'Nhập điểm',
       onClick: () => navigateTo('grades-input'),
-      color: 'orange',
-    },
-    {
-      id: 'message',
-      icon: 'zi-chat',
-      label: 'Gửi thông báo',
-      onClick: () => navigateTo('broadcast-message'),
       color: 'purple',
     },
   ];
