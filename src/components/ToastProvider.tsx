@@ -52,58 +52,6 @@ const MockToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     );
 };
 
-// --- Main Provider ---
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    if (isWeb()) {
-        return <MockToastProvider>{children}</MockToastProvider>;
-    }
-
-    return (
-        /* @ts-ignore */
-        <SnackbarProvider>
-            {children}
-        </SnackbarProvider>
-    );
-};
-
-// --- Custom Hook ---
-export const useToast = () => {
-    const webContext = useContext(MockToastContext);
-
-    // We can't conditionally call hooks, so we must call both (or handle it carefully)
-    // But useZmpSnackbar might throw if not in provider.
-    // So we need to be careful.
-
-    // Actually, if we are on web, we are in MockToastProvider.
-    // If we are on Zalo, we are in SnackbarProvider.
-
-    // We can try-catch the ZMP hook? No, hooks rules.
-
-    // Solution: We need a wrapper component that provides the UNIFIED context.
-    // But that's complicated.
-
-    // Simpler: Just return the web context if it exists.
-    if (webContext) {
-        return {
-            openSnackbar: webContext.openToast,
-            closeSnackbar: webContext.closeToast
-        };
-    }
-
-    // If no web context, assume we are in Zalo and use ZMP hook
-    // This is safe because if we are on web, webContext IS defined.
-    // If we are on Zalo, webContext is undefined, so we call useZmpSnackbar.
-    // Wait, calling hooks conditionally is forbidden.
-
-    // We must call useZmpSnackbar ALWAYS?
-    // If we call it on web (where SnackbarProvider is missing), it throws.
-
-    // So we cannot use a single hook `useToast` that conditionally calls hooks.
-
-    // We have to implement `useToast` such that it uses a Unified Context.
-    // Let's refactor ToastProvider to provide a UnifiedContext.
-};
-
 // --- Unified Provider ---
 interface UnifiedToastContextType {
     openSnackbar: (props: any) => void;
