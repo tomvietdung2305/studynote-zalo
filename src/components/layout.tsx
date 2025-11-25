@@ -17,6 +17,8 @@ import ParentConnectPage from "@/pages/parent-connect";
 import ParentDashboardPage from "@/pages/parent-dashboard";
 import StudentDetailPage from "@/pages/student-detail";
 import StudentReportPage from "@/pages/student-report";
+import { MockZMPRouter } from "@/components/MockComponents";
+import { AppToastProvider } from "@/components/ToastProvider";
 
 function AppContent() {
   const { currentPage } = useAppNavigation();
@@ -60,8 +62,6 @@ function AppContent() {
   );
 }
 
-import { MockZMPRouter } from "@/components/MockComponents";
-
 const LayoutWrapper = () => {
   // In Zalo, show full app with ZMP UI components
   const theme = zaloAdapter.getTheme();
@@ -69,10 +69,11 @@ const LayoutWrapper = () => {
 
   console.log('[Layout] Rendering app. Environment:', isWebEnv ? 'Web' : 'Zalo');
 
+  // ...
+
   const appContent = (
     <PlatformApp theme={theme}>
-      {/* @ts-ignore */}
-      <SnackbarProvider>
+      <AppToastProvider>
         <AppProvider>
           {isWebEnv ? (
             <MockZMPRouter>
@@ -88,7 +89,7 @@ const LayoutWrapper = () => {
             </ZMPRouter>
           )}
         </AppProvider>
-      </SnackbarProvider>
+      </AppToastProvider>
     </PlatformApp>
   );
 

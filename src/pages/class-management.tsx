@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Page, Header, Text, Box, Button, Icon, Input, useSnackbar } from 'zmp-ui';
+import { Page, Header, Text, Box, Button, Icon, Input } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
 import { useClasses } from '@/hooks/useApi';
+import { useAppToast } from '@/components/ToastProvider';
 
 function ClassManagementPage() {
   const { goBack } = useAppNavigation();
   const { classes, loading, createClass, updateClass, deleteClass } = useClasses();
-  const { openSnackbar } = useSnackbar();
+  const { openSnackbar } = useAppToast();
 
   // View state: 'list', 'create', 'edit'
   const [view, setView] = useState<'list' | 'create' | 'edit'>('list');

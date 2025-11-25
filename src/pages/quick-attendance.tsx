@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Page, Header, Text, Box, Button, List, Icon, useSnackbar } from 'zmp-ui';
+import { Page, Header, Text, Box, Button, List, Icon } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
 import { useAttendance, useClasses, useClassStudents } from '@/hooks/useApi';
+import { useAppToast } from '@/components/ToastProvider';
 
 function QuickAttendancePage() {
   const { goBack } = useAppNavigation();
@@ -18,7 +19,7 @@ function QuickAttendancePage() {
 
   // Get attendance from API
   const { attendance, toggleStudent, saveAttendance: saveAttendanceApi } = useAttendance(classId, selectedDate);
-  const { openSnackbar } = useSnackbar();
+  const { openSnackbar } = useAppToast();
 
   const handleSave = async () => {
     try {

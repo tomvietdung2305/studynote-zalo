@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAppNavigation } from '@/context/AppContext';
 import { useClasses, useClassStudents, useGrades } from '@/hooks/useApi';
-import { Page, Header, Box, Text, Button, Icon, Input, useSnackbar } from 'zmp-ui';
+import { Page, Header, Box, Text, Button, Icon, Input } from 'zmp-ui';
+import { useAppToast } from '@/components/ToastProvider';
 
 interface StudentGradeForm {
   id: string;
@@ -14,7 +15,7 @@ interface StudentGradeForm {
 
 function GradesInputPage() {
   const { goBack } = useAppNavigation();
-  const { openSnackbar } = useSnackbar();
+  const { openSnackbar } = useAppToast();
 
   // API Hooks
   const { classes } = useClasses();

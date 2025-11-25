@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Page, Header, Text, Box, Button, Input, useSnackbar, Icon } from 'zmp-ui';
+import { Page, Header, Text, Box, Button, Input, Icon } from 'zmp-ui';
 import { useAppNavigation } from '@/context/AppContext';
 import { zaloAdapter } from '@/adapters';
 import { useAtom } from 'jotai';
 import { isAuthenticatedAtom } from '@/store/authAtoms';
 import { authService } from '@/services/authService';
+import { useAppToast } from '@/components/ToastProvider';
 
 function ParentConnectPage() {
     const { goBack, navigateTo } = useAppNavigation();
-    const { openSnackbar } = useSnackbar();
+    const { openSnackbar } = useAppToast();
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [connectedStudent, setConnectedStudent] = useState<any>(null);

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAppNavigation } from '@/context/AppContext';
 import { useClasses } from '@/hooks/useApi';
-import { Page, Header, Box, Text, Button, Icon, useSnackbar } from 'zmp-ui';
+import { Page, Header, Box, Text, Button, Icon } from 'zmp-ui';
 import { zaloAdapter } from '@/adapters';
+import { useAppToast } from '@/components/ToastProvider';
 
 const broadcastTemplates = [
   { id: '1', title: 'Thông báo sự kiện', text: 'Thân gửi phụ huynh, lớp của chúng ta có sự kiện...' },
@@ -14,7 +15,7 @@ const broadcastTemplates = [
 function BroadcastMessagePage() {
   const { goBack } = useAppNavigation();
   const { classes } = useClasses();
-  const { openSnackbar } = useSnackbar();
+  const { openSnackbar } = useAppToast();
   const [selectedClassId, setSelectedClassId] = useState<string>('');
 
   // Set first class as default
