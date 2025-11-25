@@ -1,48 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { WebLayout, WebPageName } from './web/layout/WebLayout';
+import { WebDashboard } from './web/dashboard/WebDashboard';
+import { WebClasses } from './web/classes/WebClasses';
+import { WebStudents } from './web/students/WebStudents';
 
 /**
  * Web App Entry Point
- * Standard web application for desktop users
- * Uses React components WITHOUT ZMP-UI
+ * Full-featured desktop application with modern UI
  */
 const WebApp: React.FC = () => {
-    return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Simple navbar */}
-            <nav className="bg-white shadow-sm border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <span className="text-2xl">📚</span>
-                            <h1 className="text-xl font-bold text-gray-900">StudyNote</h1>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <a href="/" className="text-gray-600 hover:text-gray-900">Dashboard</a>
-                            <a href="/classes" className="text-gray-600 hover:text-gray-900">Classes</a>
-                            <a href="/students" className="text-gray-600 hover:text-gray-900">Students</a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+    const [currentPage, setCurrentPage] = useState<WebPageName>('dashboard');
 
-            {/* Main content */}
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                        🎉 Welcome to StudyNote Web
-                    </h2>
-                    <p className="text-gray-600 mb-6">
-                        Web app is under construction. Full features coming soon!
-                    </p>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <p className="text-sm text-blue-900">
-                            ✨ This is the desktop version. For mobile, please use Zalo Mini App.
-                        </p>
-                    </div>
-                </div>
-            </main>
-        </div>
+    const renderPage = () => {
+        switch (currentPage) {
+            case 'dashboard':
+                return <WebDashboard onNavigate={setCurrentPage} />;
+            case 'classes':
+                return <WebClasses />;
+            case 'students':
+                return <WebStudents />;
+            case 'attendance':
+                return <ComingSoon title="Attendance" />;
+            case 'grades':
+                return <ComingSoon title="Grades" />;
+            case 'reports':
+                return <ComingSoon title="AI Reports" />;
+            case 'parent-connection':
+                return <ComingSoon title="Parent Connection" />;
+            default:
+                return <WebDashboard onNavigate={setCurrentPage} />;
+        }
+    };
+
+    return (
+        <WebLayout currentPage={currentPage} onNavigate={setCurrentPage}>
+            {renderPage()}
+        </WebLayout>
     );
 };
+
+// Coming Soon placeholder
+const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
+    <div className="flex flex-col items-center justify-center py-20">
+        <div className="text-6xl mb-4">🚧</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
+        <p className="text-gray-600">This feature is coming soon!</p>
+    </div>
+);
 
 export default WebApp;
