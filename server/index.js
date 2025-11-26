@@ -7,13 +7,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Simple CORS Configuration - Allow all origins for now
+// CORS Configuration
 app.use(cors({
-    origin: '*',
-    credentials: false,
+    origin: true, // Allow all origins and reflect the request origin
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Bypass-Tunnel-Reminder', 'ngrok-skip-browser-warning']
 }));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
 
 // Middleware
 app.use(express.json());

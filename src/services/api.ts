@@ -1,6 +1,6 @@
 import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://thick-suits-teach.loca.lt/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 export interface ApiError {
   message: string;

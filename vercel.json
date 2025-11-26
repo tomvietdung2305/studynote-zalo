@@ -3,6 +3,10 @@
     "outputDirectory": "www",
     "rewrites": [
         {
+            "source": "/api/(.*)",
+            "destination": "https://studynote-server-9zf2jvc33-justtoms-projects.vercel.app/api/$1"
+        },
+        {
             "source": "/(.*)",
             "destination": "/index.html"
         }
