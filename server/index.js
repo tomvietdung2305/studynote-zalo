@@ -28,6 +28,9 @@ const notificationRoutes = require('./src/routes/notifications');
 const parentRoutes = require('./src/routes/parents');
 const webhookRoutes = require('./src/routes/webhook');
 const reportRoutes = require('./src/routes/reports');
+const homeworkRoutes = require('./src/routes/homework');
+const scheduleRoutes = require('./src/routes/schedule');
+const statisticsRoutes = require('./src/routes/statistics');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
@@ -37,6 +40,9 @@ app.use('/api/grades', gradesRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/parents', parentRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/homework', homeworkRoutes);
+app.use('/api/schedule', scheduleRoutes);
+app.use('/api/statistics', statisticsRoutes);
 app.use('/webhook', webhookRoutes);
 
 // Basic Route

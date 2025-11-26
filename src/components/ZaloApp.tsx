@@ -18,6 +18,12 @@ import ParentConnectPage from "@/pages/parent-connect";
 import ParentDashboardPage from "@/pages/parent-dashboard";
 import StudentDetailPage from "@/pages/student-detail";
 import StudentReportPage from "@/pages/student-report";
+import StatisticsPage from "@/pages/statistics";
+import HomeworkListPage from "@/pages/homework-list";
+import HomeworkCreatePage from "@/pages/homework-create";
+import HomeworkDetailPage from "@/pages/homework-detail";
+import SchedulePage from "@/pages/schedule";
+import ExamCreatePage from "@/pages/exam-create";
 
 function AppContent() {
     const { currentPage } = useAppNavigation();
@@ -48,6 +54,18 @@ function AppContent() {
                 return <ParentConnectPage />;
             case 'parent-dashboard':
                 return <ParentDashboardPage />;
+            case 'statistics':
+                return <StatisticsPage />;
+            case 'homework':
+                return <HomeworkListPage />;
+            case 'homework-create':
+                return <HomeworkCreatePage />;
+            case 'homework-detail':
+                return <HomeworkDetailPage />;
+            case 'schedule':
+                return <SchedulePage />;
+            case 'exam-create':
+                return <ExamCreatePage />;
             default:
                 return <DashboardPage />;
         }
