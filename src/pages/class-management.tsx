@@ -55,16 +55,27 @@ function ClassManagementPage() {
 
     try {
       setActionLoading(true);
+      console.log('[ClassManagement] Creating class:', { name: className, schedules, students: studentsToCreate });
       await createClass({
         name: className,
         schedules: schedules,
         students: studentsToCreate.length > 0 ? studentsToCreate : undefined,
       });
+      console.log('[ClassManagement] Class created successfully');
       openSnackbar({ text: 'Tạo lớp thành công', type: 'success' });
       setView('list');
       resetForm();
-    } catch (err) {
-      openSnackbar({ text: 'Tạo lớp thất bại', type: 'error' });
+    } catch (err: any) {
+      console.error('[ClassManagement] Create class error:', err);
+      console.error('[ClassManagement] Error details:', {
+        message: err.message,
+        response: err.response,
+        stack: err.stack
+      });
+      openSnackbar({
+        text: `Tạo lớp thất bại: ${err.message || 'Lỗi không xác định'}`,
+        type: 'error'
+      });
     } finally {
       setActionLoading(false);
     }
