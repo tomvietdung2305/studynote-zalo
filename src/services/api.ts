@@ -1,6 +1,8 @@
 import { authService } from './authService';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// Force use of relative path to leverage Vercel Rewrite (Prod) and Vite Proxy (Dev)
+// This avoids CORS issues by making requests same-origin
+const API_BASE_URL = '/api';
 
 export interface ApiError {
   message: string;
