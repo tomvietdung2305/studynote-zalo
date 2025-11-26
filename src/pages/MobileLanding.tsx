@@ -7,8 +7,8 @@ import React from 'react';
  */
 const MobileLanding: React.FC = () => {
     const handleOpenInZalo = () => {
-        // TODO: Replace with actual Zalo Mini App link
-        const zaloMiniAppUrl = 'https://zalo.me/app/YOUR_APP_ID';
+        // Zalo Mini App link with real App ID
+        const zaloMiniAppUrl = 'https://zalo.me/s/2209613120590551014/';
         window.location.href = zaloMiniAppUrl;
     };
 

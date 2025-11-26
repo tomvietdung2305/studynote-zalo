@@ -6,6 +6,7 @@ import { zaloAdapter } from "@/adapters";
 import { AppProvider, useAppNavigation } from "@/context/AppContext";
 import { Navigation } from "@/components/navigation";
 import { AuthWrapper } from "@/components/AuthWrapper";
+import { AppToastProvider } from "@/components/ToastProvider";
 import DashboardPage from "@/pages/dashboard";
 import StudentsPage from "@/pages/students";
 import QuickAttendancePage from "@/pages/quick-attendance";
@@ -71,8 +72,7 @@ const ZaloApp = () => {
 
     return (
         <App theme={theme}>
-            {/* @ts-ignore */}
-            <SnackbarProvider>
+            <AppToastProvider>
                 <AppProvider>
                     <ZMPRouter>
                         <AuthWrapper>
@@ -80,7 +80,7 @@ const ZaloApp = () => {
                         </AuthWrapper>
                     </ZMPRouter>
                 </AppProvider>
-            </SnackbarProvider>
+            </AppToastProvider>
         </App>
     );
 };
